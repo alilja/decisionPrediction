@@ -1,0 +1,60 @@
+matrix_name: matrix001
+ 
+attributes:
+- name: big
+  id: 01
+- name: bigger
+  id: 02
+- name: biggest
+  id: 03
+ 
+options:
+- name: yellow
+- name: green
+- name: blue
+ 
+decisions:
+- name: d01
+  attribute: big
+  option: yellow
+  info: banana
+
+- name: d02
+  attribute: bigger
+  option: yellow
+  info: big bird
+
+- name: d03
+  attribute: biggest
+  option: yellow
+  info: school bus
+
+- name: d04
+  attribute: big
+  option: green
+  info: sour apple
+
+- name: d05
+  attribute: bigger
+  option: green
+  info: tree
+
+- name: d06
+  attribute: biggest
+  option: green
+  info: nebula
+
+- name: d07
+  attribute: big
+  option: blue
+  info: blueberry
+
+- name: d08
+  attribute: bigger
+  option: blue
+  info: ocean
+
+- name: d09
+  attribute: biggest
+  option: blue
+  info: sky
