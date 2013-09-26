@@ -37,6 +37,8 @@ class DecisionMatrix:
         self.name = self._matrix["matrix_name"]
         self.decisions = self._matrix["decisions"]
 
+        self.viewedDecisions = []
+
     def __str__(self):
         return self.name
 
@@ -64,12 +66,13 @@ class DecisionMatrix:
         print(output)
 
     def findDecision(self, decision):
-        decisionEntry = (element for element in self.decisions if element["name"] == decision).__next__()
-        return decisionEntry
+        decisionEntry = [element for element in self.decisions if element["name"] == decision]
+        print(decisionEntry)
+        return decisionEntry[0]
 
     def view(self, decision):
-        self.viewedDecisions.append(decision)
         selectedDecision = self.findDecision(decision)
+        self.viewedDecisions.append(selectedDecision)
         return selectedDecision["info"]
 
     def getOptions(self):
@@ -80,6 +83,9 @@ class DecisionMatrix:
 
     def getDecisions(self):
         return self.decisions
+
+    def getDecisionList(self):
+        return self.viewedDecisions
 
     def getMatrix(self):
         return self._matrix
@@ -96,16 +102,3 @@ class DecisionMatrix:
         return info["option"]
 
     
-decisions = DecisionMatrix()
-data = ""
-oldData = ""
-
-while(data != "quit"):
-    decisions.display()
-    data = input("Your decision: ")
-    if(data == oldData):
-        decisions.view(data)
-        print("You have selected decision "+data+".")
-        data = "quit"
-    print(decisions.view(data)+"\n\n")
-    oldData = data
