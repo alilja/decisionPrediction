@@ -84,6 +84,17 @@ class DecisionMatrix:
     def getMatrix(self):
         return self._matrix
 
+    def getDecisionInfo(self, decisionName):
+        return findDecision(decisionName)
+
+    def getDecisionAttribute(self, decisionName):
+        info = findDecision(decisionName)
+        return info["attribute"]
+
+    def getDecisionOption(self, decisionName):
+        info = findDecision(decisionName)
+        return info["option"]
+
     
 decisions = DecisionMatrix()
 data = ""
