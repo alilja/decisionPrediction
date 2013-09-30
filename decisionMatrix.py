@@ -1,4 +1,5 @@
 import yaml
+import time
 
 class TextFormatting:
     #centerText: str, int -> str
@@ -72,6 +73,7 @@ class DecisionMatrix:
 
     def view(self, decision):
         selectedDecision = self.findDecision(decision)
+        selectedDecision["timeViewed"] = time.clock()
         self.viewedDecisions.append(selectedDecision)
         return selectedDecision["info"]
 
@@ -91,14 +93,13 @@ class DecisionMatrix:
         return self._matrix
 
     def getDecisionInfo(self, decisionName):
-        return findDecision(decisionName)
+        return self.findDecision(decisionName)
 
     def getDecisionAttribute(self, decisionName):
-        info = findDecision(decisionName)
+        info = self.findDecision(decisionName)
         return info["attribute"]
 
     def getDecisionOption(self, decisionName):
-        info = findDecision(decisionName)
-        return info["option"]
+        return self.findDecision(decisionName)["option"]
 
     

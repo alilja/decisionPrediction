@@ -1,9 +1,12 @@
 from decisionMatrix import *
 
-#list-of-dict, list-of-str, list-of-str --> 
-def analyzeDecisionStyle(decisionList, attributes, options):
+#list-of-dict, list-of-str, list-of-str --> str
+def analyzeDecisionStyle(decisionList, attributes, options, minPercentage=0.7):
 	if(len(decisionList) <= 1):
 		return
+
+	### CAPTURING EQW, LIM, LVA, MAU, DIS, & SAT ###
+
 	transitionList = []
 	numOPWISE = 0
 	numATTWISE = 0
@@ -24,7 +27,12 @@ def analyzeDecisionStyle(decisionList, attributes, options):
 			numMIXED += 1
 		print("prev: "+previousDecision["name"]+"  this:"+decisionList[i]["name"]+"  "+transitionList[-1])
 		previousDecision = decisionList[i]
-	print(numOPWISE/(numATTWISE+numMIXED))
+
+	if((numOPWISE/(numATTWISE+numMIXED))/OPATTRatio >= minPercentage): #higher values mean more precision, but more potential false negatives
+		return "EQW|LIM|LVA|MAU"
+	else:
+		return "DIS|SAT"
+
 	print(OPATTRatio)
 
 decisions = DecisionMatrix()
