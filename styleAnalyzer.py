@@ -49,4 +49,4 @@ while(data != "quit"):
     	print(decisions.view(data)+"\n\n")
     oldData = data
 
-analyzeDecisionStyle(decisions.getDecisionList(), decisions.getAttributes(), decisions.getOptions())
+print(analyzeDecisionStyle(decisions.getDecisionList(), decisions.getAttributes(), decisions.getOptions()))
