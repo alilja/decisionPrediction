@@ -47,9 +47,9 @@ def analyzeDecisionStyle(decisionList, attributes, options, minPercentage=0.7):
     correlation = pearsonr(ARList, NBoxList)
     
     if(correlation < 0):
-        return("EBA|LEX|REC")
+        return "EBA|LEX|REC"
     else:
-        return("DOM|MAJ|ADD|MCD")
+        return "DOM|MAJ|ADD|MCD"
 
 
 
