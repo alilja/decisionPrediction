@@ -24,6 +24,37 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
 
     #if(searchIndex < 0):
 
+#####################################################
+    ### CAPTURING ADD, DOM, MAJ, MCD, EBA, LEX, & REC ###
+    #####################################################
+
+    attributesViewedOrdered = [x["attribute"] for x in decisionList]
+    attributeRanks = [[] for i in range(0, len(attributes))]
+    for i in range(0, len(attributesViewedOrdered)):
+        rank = i+1
+        attributeViewed = attributesViewedOrdered[i]
+        attributeNumber = attributes.index(attributeViewed)
+
+        attributeRanks[attributeNumber].append(rank)
+
+    ARList = []
+    NBoxList = []
+
+    for attributeRankList in attributeRanks:
+        nbox = len(attributeRankList)
+        gross = sum(attributeRankList)
+        avg = gross/nbox
+
+        ARList.append(avg)
+        NBoxList.append(nbox)
+
+    correlation = pearsonr(ARList, NBoxList)
+    
+    if(correlation < 0):
+        return("EBA|LEX|REC")
+    else:
+        return("DOM|MAJ|ADD|MCD")
+
     ################################################
     ### CAPTURING EQW, LIM, LVA, MAU, DIS, & SAT ###
     ################################################
@@ -88,36 +119,6 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
     else:
         return "DIS|SAT"
 
-    #####################################################
-    ### CAPTURING ADD, DOM, MAJ, MCD, EBA, LEX, & REC ###
-    #####################################################
-
-    attributesViewedOrdered = [x["attribute"] for x in decisionList]
-    attributeRanks = [[] for i in range(0, len(attributes))]
-    for i in range(0, len(attributesViewedOrdered)):
-        rank = i+1
-        attributeViewed = attributesViewedOrdered[i]
-        attributeNumber = attributes.index(attributeViewed)
-
-        attributeRanks[attributeNumber].append(rank)
-
-    ARList = []
-    NBoxList = []
-
-    for attributeRankList in attributeRanks:
-        nbox = len(attributeRankList)
-        gross = sum(attributeRankList)
-        avg = gross/nbox
-
-        ARList.append(avg)
-        NBoxList.append(nbox)
-
-    correlation = pearsonr(ARList, NBoxList)
-    
-    if(correlation < 0):
-        return("EBA|LEX|REC")
-    else:
-        return("DOM|MAJ|ADD|MCD")
 
 decisions = DecisionMatrix()
 
