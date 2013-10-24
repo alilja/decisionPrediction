@@ -18,43 +18,52 @@ decisions:
   attribute: big
   option: yellow
   info: banana
+  utility: 1
 
 - name: d02
   attribute: bigger
   option: yellow
   info: big bird
+  utility: 3
 
 - name: d03
   attribute: biggest
   option: yellow
   info: school bus
+  utility: 5
 
 - name: d04
   attribute: big
   option: green
   info: sour apple
+  utility: 2
 
 - name: d05
   attribute: bigger
   option: green
   info: tree
+  utility: 5
 
 - name: d06
   attribute: biggest
   option: green
   info: nebula
+  utility: 1
 
 - name: d07
   attribute: big
   option: blue
   info: blueberry
+  utility: 4
 
 - name: d08
   attribute: bigger
   option: blue
   info: ocean
+  utility: 2
 
 - name: d09
   attribute: biggest
   option: blue
   info: sky
+  utility: 3

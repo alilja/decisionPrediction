@@ -46,7 +46,7 @@ class DecisionMatrix:
     def search(self, decisionList, option, attribute):
         return [element for element in decisionList if element['attribute'] == attribute and element['option'] == option]
 
-    def display(self):
+    def display(self, showUtilities = False):
         longestOptionLength = len(max(self.options, key=len))
         longestAttributeLength = len(max(self.attributes, key=len))
 
@@ -59,7 +59,10 @@ class DecisionMatrix:
             for attribute in self.attributes:
                 item = self.search(self.decisions, option, attribute)
                 if(item):
-                    output += " | " + self.formatting.centerText(item[0]["name"], longestAttributeLength)
+                    displayText = item[0]["name"]
+                    if(showUtilities):
+                        displayText += " " + str(item[0]["utility"])
+                    output += " | " + self.formatting.centerText(displayText, longestAttributeLength)
                 else:
                     output += " | " + " "*longestAttributeLength
             output += "\n"
@@ -102,4 +105,7 @@ class DecisionMatrix:
     def getDecisionOption(self, decisionName):
         return self.findDecision(decisionName)["option"]
 
+
+test = DecisionMatrix()
+test.display(True)
     
