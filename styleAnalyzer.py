@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from decisionMatrix import *
 
 def pearsonr(x, y):
@@ -97,6 +98,22 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         MAURanks.sort(reverse=True)
         LIMRanks.sort()
         LVARanks.sort()
+
+        i = 0
+        currentList = EQWRanks
+
+        bestMatchName = ""
+        bestMatchScore = 0
+
+        while(i < 4):
+            if(i == 1):
+                currentList = MAURanks
+            elif(i == 2):
+                currentList = LIMRanks
+            elif(i == 3):
+                currentList = LVARanks
+            
+            i += 1
 
         return "EQW|LIM|LVA|MAU"
 
