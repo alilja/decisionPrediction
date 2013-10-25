@@ -58,10 +58,10 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         # LIM chooses the option with the worst value of the least important attribute
         # LVA chooses the option with the least variance across attribute values
 
-        EQWRanks = {}
-        MAURanks = {}
-        LIMRanks = {}
-        LVARanks = {}
+        EQWRanks = []
+        MAURanks = []
+        LIMRanks = []
+        LVARanks = []
 
         lowestAttribute = min(weightedAttributes, key=weightedAttributes.get)
 
@@ -69,19 +69,26 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
                 optionDecisions = [d for d in matrix.getDecisions() if d["option"] == option]
 
                 #EQW ranks
-                EQWRanks[option] = sum([d["utility"] for d in optionDecisions])
-                print(EQWRanks)
-
-                #MAU and LIM ranks
+                EQWRanks.append((sum([d["utility"] for d in optionDecisions]), option))
+                
                 MAUUtility = 0
                 for decision in optionDecisions: #flip through each decision in the ones we grabbed
+                    #MAU ranks
                     MAUUtility += decision["utility"] * weightedAttributes[decision["attribute"]] #weight that decision's utility by the attribute weight
 
-                MAURanks[option] = MAUUtility
+                    #LIM ranks
+                    if(decision["attribute"] == lowestAttribute):
+                        LIMRanks.append((decision["utility"], option))
 
-                #LIM ranks
-                #for decision in 
-                #if(optionDecisions["attribute"] == lowestAttribute and optionDecisions[])
+
+                MAURanks.append((MAUUtility, option))
+
+        EQWRanks.sort(reverse=True)
+        MAURanks.sort(reverse=True)
+        LIMRanks.sort()
+        LVARanks.sort()
+
+        print(EQWRanks, MAURanks, LIMRanks, LVARanks)
 
         return "EQW|LIM|LVA|MAU"
 
