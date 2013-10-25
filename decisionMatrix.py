@@ -96,7 +96,7 @@ class DecisionMatrix:
         return self.findDecision(decisionName)
 
     def getDecisionAttribute(self, decisionName):
-        info = self.findDecision(decisionName)
+        info = self.findDecision(decisionName)/
         return info["attribute"]
 
     def getDecisionOption(self, decisionName):
