@@ -19,6 +19,11 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
     attributes = matrix.getAttributes()
     options = matrix.getOptions()
     decisionList = matrix.getDecisionList()
+    decisionRankList = []
+
+    for item in rankOrder:
+        decisionEntry = matrix.findDecision(item)
+        decisionRankList.append(decisionEntry["option"])
 
     if(len(decisionList) <= 1):
         return ""
@@ -59,10 +64,8 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         # LIM chooses the option with the worst value of the least important attribute
         # LVA chooses the option with the least variance across attribute values
 
-        EQWRanks = []
-        MAURanks = []
-        LIMRanks = []
-        LVARanks = []
+
+        ranks = {"EQW":[],"MAU":[],"LIM":[],"LVA":[]}
 
         lowestAttribute = min(weightedAttributes, key=weightedAttributes.get)
 
@@ -73,7 +76,7 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
                 utilityAverage = sum(utilityValues)/len(options)
 
                 #EQW ranks
-                EQWRanks.append((sum(utilityValues), option))
+                ranks["EQW"].append((sum(utilityValues), option))
 
                 MAUUtility = 0
                 variance = 0
@@ -84,38 +87,40 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
 
                     #LIM ranks
                     if(decision["attribute"] == lowestAttribute):
-                        LIMRanks.append((decision["utility"], option))
+                        ranks["LIM"].append((decision["utility"], option))
 
                     #LVA ranks
                     variance += (decision["utility"] - utilityAverage) ** 2
 
                 variance = variance / (len(options) - 1)
-                LVARanks.append((variance, option))
+                ranks["LVA"].append((variance, option))
 
-                MAURanks.append((MAUUtility, option))
+                ranks["MAU"].append((MAUUtility, option))
 
-        EQWRanks.sort(reverse=True)
-        MAURanks.sort(reverse=True)
-        LIMRanks.sort()
-        LVARanks.sort()
-
-        i = 0
-        currentList = EQWRanks
+        ranks["EQW"].sort(reverse=True)
+        ranks["MAU"].sort(reverse=True)
+        ranks["LIM"].sort()
+        ranks["LVA"].sort()
 
         bestMatchName = ""
         bestMatchScore = 0
 
-        while(i < 4):
-            if(i == 1):
-                currentList = MAURanks
-            elif(i == 2):
-                currentList = LIMRanks
-            elif(i == 3):
-                currentList = LVARanks
-            
+        for style, currentList in ranks:            
+            deviation = 0
+
+            for predictedItemRank in range(0, len(currentList)):
+                predictedRankName = currentList[predictedItemRank][1]
+                empiricalRank = decisionRankList.index(predictedRankName)
+
+                deviation = (predictedItemRank - empiricalRank) ** 2
+
+            if(deviation < bestMatchScore):
+                bestMatchScore = deviation
+                bestMatchName = style
+
             i += 1
 
-        return "EQW|LIM|LVA|MAU"
+        return bestMatchName
 
     else:
         return "DIS|SAT"
@@ -164,7 +169,8 @@ while(data != "quit"):
     if(data.lower() == "done"):
         print("Enter your top four choices separated by spaces.")
         choices = input("> ")
-        rankedDecisions = " ".split(choices)
+        rankedDecisions = choices.split(" ")
+        print(rankedDecisions)
         break
     else:
         print(decisions.view(data)+"\n\n")
