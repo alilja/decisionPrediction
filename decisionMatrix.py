@@ -14,15 +14,6 @@ class TextFormatting:
                 return " "*int((numSpaces-1)/2) + text + " "*int((numSpaces+1)/2)
         return text
 
-    def edgeAlignColumns(self, leftTextItems, rightTextItems, space = 0):
-        if(len(leftTextItems) != len(rightTextItems)):
-            return self
-        output = leftTextItems[0]
-        longestLeft = max(leftTextItems, key=len)
-        longestRight = max(rightTextItems, key=len)
-        iteratingList = zip(leftTextItems, rightTextItems)
-        print(iteratingList)
-
     #standardizeCellWidths: list-of-str, int -> list-of-str
     def standardizeCellWidths(self, listOfItems, standardWidth):
         output = []
@@ -81,7 +72,11 @@ class DecisionMatrix:
     def findDecision(self, decision):
         decisionEntry = [element for element in self.decisions if element["name"] == decision]
         #print(decisionEntry)
-        return decisionEntry[0]
+        try:
+            return decisionEntry[0]
+        except:
+            print('Decision "'+decision+'" does not exist.')
+            raise
 
     def view(self, decision):
         selectedDecision = self.findDecision(decision)

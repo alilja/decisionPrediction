@@ -57,8 +57,6 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         ################################################
 
         OPATTRatio = ((len(attributes) - 1)*len(options))/(len(options) - 1) #ratio of options to attributes
-
-
         if((numOPWISE/(numATTWISE+numMIXED))/OPATTRatio >= minCorrelationPercentage): #higher values mean more precision, but more potential false negatives
             
             ###################################
@@ -107,10 +105,12 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
             ranks["LVA"].sort()
 
             bestMatchName = ""
-            bestMatchScore = 0
+            bestMatchScore = 1000
 
-            for style, currentList in ranks:            
+            for style, currentList in ranks.items():            
                 deviation = 0
+
+                print(style, currentList)
 
                 for predictedItemRank in range(0, len(currentList)):
                     predictedRankName = currentList[predictedItemRank][1]     #grab the option name of the current decision in the rank list we're looking at
@@ -165,11 +165,22 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         return "FATAL ERROR. searchIndex = 0.0"
 
 decisions = DecisionMatrix()
-
 data = ""
 rankedDecisions = []
 
-while(data != "quit"):
+preBuiltDecisions = [1,2,3,
+                     4,5,6,
+                     7,8,9]
+                     
+selectedOptions = [1, 5, 9]
+
+for viewed in preBuiltDecisions:
+    decisions.view("d0"+str(viewed))
+
+for selected in selectedOptions:
+    rankedDecisions.append("d0"+str(selected))
+
+"""while(data != "quit"):
     decisions.display(True)
     print("Enter the decision name to view the decision.\nType \"done\" to make your selection.")
     data = input("> ")
@@ -180,7 +191,7 @@ while(data != "quit"):
         print(rankedDecisions)
         break
     else:
-        print(decisions.view(data)+"\n\n")
+        print(decisions.view(data)+"\n\n")"""
 
 print(analyzeDecisionStyle(decisions, rankedDecisions, {"big":0.5,"bigger":0.3,"biggest":0.2}))
 
