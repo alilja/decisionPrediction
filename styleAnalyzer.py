@@ -37,15 +37,17 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
     numMIXED = 0
 
     # Figure out what the ratio of option-wise, attribute-wise, and mixed transitions there are
+    iterDecisionList = iter(decisionList)
+    next(iterDecisionList)
     previousDecision = decisionList[0]
-    for i in range(1, len(decisionList)):
-        if(previousDecision["attribute"] == decisionList[i]["attribute"]): #within attribute switch; option changes #intradimensional
+    for entry in iterDecisionList:
+        if(previousDecision["attribute"] == entry["attribute"]): #within attribute switch; option changes #intradimensional
             numATTWISE += 1
-        elif(previousDecision["option"] == decisionList[i]["option"]): #within option switch; attribute changes #interdimensional
+        elif(previousDecision["option"] == entry["option"]): #within option switch; attribute changes #interdimensional
             numOPWISE += 1
         else: #both the option and attribute change
             numMIXED += 1
-        previousDecision = decisionList[i]
+        previousDecision = entry
 
     searchIndex = (numOPWISE - numATTWISE)/(numOPWISE + numATTWISE)
     debugLog(searchIndex) #debug
@@ -111,18 +113,15 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
                 deviation = 0
 
                 print(style, currentList)
+                currentUtilities, currentOptions = zip(*currentList)
 
-                for predictedItemRank in range(0, len(currentList)):
-                    predictedRankName = currentList[predictedItemRank][1]     #grab the option name of the current decision in the rank list we're looking at
-                    empiricalRank = decisionRankList.index(predictedRankName) #grab the rank of that option in the user-inputed rank list
-
+                for predictedItemRank, predictedItem in enumerate(currentOptions):
+                    empiricalRank = decisionRankList.index(predictedItem) #grab the rank of that option in the user-inputed rank list
                     deviation = (predictedItemRank - empiricalRank) ** 2      #calcuate deviation
 
                 if(deviation < bestMatchScore):
                     bestMatchScore = deviation
                     bestMatchName = style
-
-                i += 1
 
             return bestMatchName
         else:
@@ -171,8 +170,8 @@ rankedDecisions = []
 preBuiltDecisions = [1,2,3,
                      4,5,6,
                      7,8,9]
-                     
-selectedOptions = [1, 5, 9]
+
+selectedOptions = [9, 5, 1]
 
 for viewed in preBuiltDecisions:
     decisions.view("d0"+str(viewed))
