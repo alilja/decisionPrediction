@@ -60,23 +60,23 @@ class DecisionMatrix:
         longestAttributeLength = len(max(self.attributes, key=len))
 
         #render attributes
-        output = " "*longestOptionLength + " | " + " | ".join(self.formatting.standardizeCellWidths(self.attributes, longestAttributeLength)) + "\n"
+        output = [" "*longestOptionLength + " | " + " | ".join(self.formatting.standardizeCellWidths(self.attributes, longestAttributeLength)) + "\n"]
 
         #render options
         for option in self.options:
-            output += self.formatting.centerText(option, longestOptionLength)
+            output.append(self.formatting.centerText(option, longestOptionLength))
             for attribute in self.attributes:
                 item = self.search(self.decisions, option, attribute)
                 if(item):
                     displayText = item[0]["name"]
                     if(showUtilities):
                         displayText += " " + str(item[0]["utility"])
-                    output += " | " + self.formatting.centerText(displayText, longestAttributeLength)
+                    output.append(" | " + self.formatting.centerText(displayText, longestAttributeLength))
                 else:
-                    output += " | " + " "*longestAttributeLength
-            output += "\n"
+                    output.append(" | " + " "*longestAttributeLength)
+            output.append("\n")
 
-        print(output)
+        print("".join(output))
 
     def findDecision(self, decision):
         decisionEntry = [element for element in self.decisions if element["name"] == decision]
