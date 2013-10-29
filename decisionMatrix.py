@@ -70,10 +70,10 @@ class DecisionMatrix:
         print("".join(output))
 
     def findDecision(self, decision):
-        decisionEntry = [element for element in self.decisions if element["name"] == decision]
+        decisionEntry = (element for element in self.decisions if element["name"] == decision)
         #print(decisionEntry)
         try:
-            return decisionEntry[0]
+            return decisionEntry.__next__()
         except:
             print('Decision "'+decision+'" does not exist.')
             raise
@@ -108,5 +108,8 @@ class DecisionMatrix:
 
     def getDecisionOption(self, decisionName):
         return self.findDecision(decisionName)["option"]
+
+test = DecisionMatrix("matrix.yaml")
+print(test.findDecision("d01"))
 
     

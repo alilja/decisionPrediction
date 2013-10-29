@@ -69,6 +69,8 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
             # LIM chooses the option with the worst value of the least important attribute
             # LVA chooses the option with the least variance across attribute values
 
+            # TODO(alilja@iastate.edu) for some reason EQW/LIM and MAU/LVA are getting called at the same time. It's probably because of the matrix settings.
+
             ranks = {"EQW":[],"MAU":[],"LIM":[],"LVA":[]}
 
             lowestAttribute = min(weightedAttributes, key=weightedAttributes.get)
@@ -192,5 +194,5 @@ for selected in selectedOptions:
     else:
         print(decisions.view(data)+"\n\n")"""
 
-print(analyzeDecisionStyle(decisions, rankedDecisions, {"big":0.5,"bigger":0.3,"biggest":0.2}))
+print(analyzeDecisionStyle(matrix=decisions, rankOrder=rankedDecisions, weightedAttributes={"big":0.5,"bigger":0.3,"biggest":0.2}))
 
