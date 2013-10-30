@@ -195,4 +195,3 @@ for selected in selectedOptions:
         print(decisions.view(data)+"\n\n")"""
 
 print(analyzeDecisionStyle(matrix=decisions, rankOrder=rankedDecisions, weightedAttributes={"big":0.5,"bigger":0.3,"biggest":0.2}))
-
