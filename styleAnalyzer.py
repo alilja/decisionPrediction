@@ -38,7 +38,7 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
 
     # Figure out what the ratio of option-wise, attribute-wise, and mixed transitions there are
     iterDecisionList = iter(decisionList)
-    next(iterDecisionList)
+    iterDecisionList.__next__()
     previousDecision = decisionList[0]
     for entry in iterDecisionList:
         if(previousDecision["attribute"] == entry["attribute"]): #within attribute switch; option changes #intradimensional
