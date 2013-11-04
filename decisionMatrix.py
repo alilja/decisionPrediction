@@ -28,6 +28,8 @@ class DecisionMatrix:
     name = ""
     viewedDecisions = []
 
+    _startTime = 0
+
     def __init__(self, matrixFile = "matrix.yaml"):
         self.formatting = TextFormatting()  
         self._matrix = yaml.load(open(matrixFile,"r"))
@@ -37,6 +39,8 @@ class DecisionMatrix:
         self.options = [d["name"] for d in self._matrix["options"]]
         self.name = self._matrix["matrix_name"]
         self.decisions = self._matrix["decisions"]
+
+        self._startTime = time.clock()
 
         self.viewedDecisions = []
 
@@ -80,7 +84,12 @@ class DecisionMatrix:
 
     def view(self, decision):
         selectedDecision = self.findDecision(decision)
-        selectedDecision["timeViewed"] = time.clock()
+        previousTime = self._startTime
+        if(len(self.viewedDecisions) > 0):
+            previousTime = self.viewedDecisions[-1]["timeOpened"]
+        thisTime = time.clock()
+        selectedDecision["timeOpened"] = thisTime
+        selectedDecision["timeViewed"] = thisTime - previousTime
         self.viewedDecisions.append(selectedDecision)
         return selectedDecision["info"]
 

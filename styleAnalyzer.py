@@ -23,7 +23,7 @@ def pearsonr(x, y):
 def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPercentage=0.7, timeTolerance=0.8):
     decisionList = matrix.getDecisionList()
     if(len(decisionList) <= 1):
-        return ""
+        return "ERR: Not enough decisions made."
     attributes = matrix.getAttributes()
     options = matrix.getOptions()
     decisionRankList = []
@@ -43,14 +43,14 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
     for entry in iterDecisionList:
         if(previousDecision["attribute"] == entry["attribute"]): #within attribute switch; option changes #intradimensional
             numATTWISE += 1
-        elif(previousDecision["option"] == entry["option"]): #within option switch; attribute changes #interdimensional
+        elif(previousDecision["option"] == entry["option"]):     #within option switch; attribute changes #interdimensional
             numOPWISE += 1
-        else: #both the option and attribute change
+        else:                                                    #both the option and attribute change
             numMIXED += 1
         previousDecision = entry
 
     searchIndex = (numOPWISE - numATTWISE)/(numOPWISE + numATTWISE)
-    debugLog(searchIndex) #debug
+    debugLog(searchIndex)
 
     if(searchIndex > 0):
 
@@ -118,8 +118,9 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
                 currentUtilities, currentOptions = zip(*currentList)
 
                 for predictedItemRank, predictedItem in enumerate(currentOptions):
-                    empiricalRank = decisionRankList.index(predictedItem) #grab the rank of that option in the user-inputed rank list
-                    deviation = (predictedItemRank - empiricalRank) ** 2      #calcuate deviation
+                    #grab the rank of that option in the user-inputed rank list
+                    empiricalRank = decisionRankList.index(predictedItem) 
+                    deviation = (predictedItemRank - empiricalRank) ** 2    
 
                 if(deviation < bestMatchScore):
                     bestMatchScore = deviation
@@ -135,20 +136,25 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         ### CAPTURING ADD, DOM, MAJ, MCD, EBA, LEX, & REC ###
         #####################################################
 
-        attributesViewedOrdered = [x["attribute"] for x in decisionList] #grab the attributes for every decision the user made
-        attributeRanks = [[] for i in range(0, len(attributes))] #create an empty list of lists as long as there are attributes
-        #run through and increase the rank equal to the order each decision was viewed; earlier decisions are ranked more highly
+        #grab the attributes for every decision the user made
+        attributesViewedOrdered = [x["attribute"] for x in decisionList]
+
+        #create an empty list of lists as long as there are attributes 
+        attributeRanks = [[] for i in range(0, len(attributes))] 
+
+        # run through and increase the rank equal to the order each decision 
+        # was viewed; earlier decisions are ranked more highly
         for i in range(0, len(attributesViewedOrdered)):
             rank = i+1
-            attributeViewed = attributesViewedOrdered[i] #the attribute that was viewed
+            attributeViewed = attributesViewedOrdered[i] # the attribute 
+                                                         # that was viewed
             attributeNumber = attributes.index(attributeViewed) 
-
             attributeRanks[attributeNumber].append(rank) 
 
         ARList = []
         NBoxList = []
 
-        for attributeRankList in attributeRanks: #math
+        for attributeRankList in attributeRanks:
             nbox = len(attributeRankList)
             gross = sum(attributeRankList)
             avg = gross/nbox
@@ -163,7 +169,7 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         else:
             return("DOM|MAJ|ADD|MCD")
     else:
-        return "FATAL ERROR. searchIndex = 0.0"
+        return "ERR: Search index = 0.0"
 
 decisions = DecisionMatrix()
 data = ""
@@ -194,4 +200,5 @@ for selected in selectedOptions:
     else:
         print(decisions.view(data)+"\n\n")"""
 
-print(analyzeDecisionStyle(matrix=decisions, rankOrder=rankedDecisions, weightedAttributes={"big":0.5,"bigger":0.3,"biggest":0.2}))
+print(analyzeDecisionStyle(matrix=decisions, rankOrder=rankedDecisions, 
+                        weightedAttributes={"big":0.5,"bigger":0.3,"biggest":0.2}))
