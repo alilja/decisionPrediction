@@ -32,6 +32,8 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         decisionEntry = matrix.findDecision(item)
         decisionRankList.append(decisionEntry["option"])
 
+    decisionTimes = {}
+
     numOPWISE = 0
     numATTWISE = 0
     numMIXED = 0
@@ -47,6 +49,10 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
             numOPWISE += 1
         else:                                                    #both the option and attribute change
             numMIXED += 1
+        if(entry["name"] not in decisionTimes):
+            decisionTimes[entry["name"]] = 0
+        decisionTimes[entry["name"]] += entry["timeViewed"]
+        
         previousDecision = entry
 
     searchIndex = (numOPWISE - numATTWISE)/(numOPWISE + numATTWISE)
