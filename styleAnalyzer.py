@@ -12,24 +12,25 @@ class DecisionTracer:
 
     def __init__(self, matrix, rankedDecisions, weightedAttributes):
         self._matrix = matrix
-        self.decisions = self._matrix.getDecisions()
-        self.decisionsMade = self._matrix.getDecisionList()
-        self.attributes = self._matrix.getAttributes()
-        self.options = self._matrix.getOptions()
+        self._decisions = self._matrix.getDecisions()
+        self._decisionsMade = self._matrix.getDecisionList()
+        self._attributes = self._matrix.getAttributes()
+        self._options = self._matrix.getOptions()
 
         self._weightedAttributes = weightedAttributes
 
-        self.rankedDecisions = []
-        for item in rankOrder:
-            decisionEntry = self.matrix.findDecision(item)
-            self.rankedDecisions.append(decisionEntry["option"])
+        self._rankedDecisions = []
+        for item in rankedDecisions:
+            decisionEntry = self._matrix.findDecision(item)
+            self._rankedDecisions.append(decisionEntry["option"])
 
-    _DEBUG = True
-    def debugLog(*msg):
+        self._DEBUG = True
+
+    def debugLog(self, *msg):
         if(self._DEBUG):
             print(msg)
 
-    def pearsonr(x, y):
+    def pearsonr(self, x, y):
         # Assume len(x) == len(y)
         n = len(x)
         sum_x = float(sum(x))
@@ -61,6 +62,8 @@ class DecisionTracer:
             #both the option and attribute change
             else:                                                    
                 numMIXED += 1
+            print(entry)
+            previousDecision = entry
         return numOPWISE, numATTWISE, numMIXED
 
     def calculateOptionTimes(self):
@@ -73,22 +76,22 @@ class DecisionTracer:
         return optionTimes
 
     def caclulateSearchIndex(self):
-        intra, inter, mixed = countTransitions()
+        intra, inter, mixed = self.countTransitions()
         searchIndex = (inter - intra)/(inter + intra)
-        debugLog(searchIndex)
+        self.debugLog(searchIndex)
         return searchIndex
 
     def method1(self, opWise, attWise, mixed):
         """Capture EQW, MAU, LIM and LVA"""
-        OPATTRatio = ((len(self._attributes) - 1)*len(self._options))
-                        /(len(self._options) - 1) #ratio of options to attributes
+        OPATTRatio = ((len(self._attributes) - 1)*
+                        len(self._options))/(len(self._options) - 1) #ratio of options to attributes
         return (opWise/(attWise+mixed))/OPATTRatio        
 
     def method2(self):
         optionTimes = self.calculateOptionTimes()
         minTime = min(optionTimes.values())
         maxTime = max(optionTimes.values())
-        debugLog(minTime, maxTime)
+        self.debugLog(minTime, maxTime)
         if(minTime/maxTime >= 0.8):
             return("DOM|MAJ")
         return("ADD|MCD")
@@ -109,7 +112,7 @@ class DecisionTracer:
         for i in range(0, len(attributesViewedOrdered)):
             rank = i+1
             attributeViewed = attributesViewedOrdered[i] 
-            attributeIndex = attributes.index(attributeViewed) 
+            attributeIndex = self._attributes.index(attributeViewed) 
             attributeRanks[attributeIndex].append(rank) 
 
         ARList = []
@@ -162,8 +165,8 @@ class DecisionTracer:
                 for thisDecision in thisOptionsDecisions: 
                     #MAU ranks
                     #weight that thisDecision's utility by the attribute weight
-                    MAUUtility += thisDecision["utility"] * 
-                                  self._weightedAttributes[thisDecision["attribute"]] 
+                    MAUUtility += (thisDecision["utility"]* 
+                                  self._weightedAttributes[thisDecision["attribute"]]) 
                                   #the weight of the attribute currently being looked at
                                   #by thisDecision
 
@@ -217,7 +220,7 @@ class DecisionTracer:
                 return("EBA|LEX|REC")
             else:
                 return self.method2()
-                
+
 decisions = DecisionMatrix()
 data = ""
 rankedDecisions = []
@@ -246,6 +249,7 @@ for selected in selectedOptions:
         break
     else:
         print(decisions.view(data)+"\n\n")"""
+decisionTracer = DecisionTracer(matrix=decisions, rankedDecisions=rankedDecisions, 
+                        weightedAttributes={"big":0.5,"bigger":0.3,"biggest":0.2})
 
-print(analyzeDecisionStyle(matrix=decisions, rankOrder=rankedDecisions, 
-                        weightedAttributes={"big":0.5,"bigger":0.3,"biggest":0.2}))
+print(decisionTracer.DecisionTracer())
