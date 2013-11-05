@@ -75,10 +75,8 @@ class DecisionTracer:
             optionTimes[entry["option"]] += entry["timeViewed"]
         return optionTimes
 
-    def caclulateSearchIndex(self):
-        intra, inter, mixed = self.countTransitions()
-        searchIndex = (inter - intra)/(inter + intra)
-        self.debugLog(searchIndex)
+    def calculateSearchIndex(self, op, att, mixed):
+        searchIndex = (op - att)/(op + att)
         return searchIndex
 
     def method1(self, opWise, attWise, mixed):
@@ -208,9 +206,10 @@ class DecisionTracer:
         return bestMatchName
 
     def DecisionTracer(self, correlation = 0.7):
-        searchIndex = self.caclulateSearchIndex()
+        op, att, mix = self.countTransitions()
+        searchIndex = self.calculateSearchIndex(op, att, mix)
         if(searchIndex > 0):
-            op, att, mix = self.countTransitions()
+            
             if(self.method1(op, att, mix) >= correlation):
                 return self.method4()
             else:
@@ -249,7 +248,10 @@ for selected in selectedOptions:
         break
     else:
         print(decisions.view(data)+"\n\n")"""
+
 decisionTracer = DecisionTracer(matrix=decisions, rankedDecisions=rankedDecisions, 
                         weightedAttributes={"big":0.5,"bigger":0.3,"biggest":0.2})
-
-print(decisionTracer.DecisionTracer())
+op, att, mix = decisionTracer.countTransitions()
+print(op, att, mix)
+print(decisionTracer.calculateSearchIndex(op, att, mix))
+#print(decisionTracer.DecisionTracer())
