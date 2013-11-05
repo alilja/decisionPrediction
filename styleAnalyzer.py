@@ -4,6 +4,7 @@ from decisionMatrix import *
 class DecisionTracer:
     _attributes = []
     _options = []
+    _decisions = []
 
     _decisionsMade = []
     _rankedDecisions = []
@@ -11,9 +12,12 @@ class DecisionTracer:
 
     def __init__(self, matrix, rankedDecisions, weightedAttributes):
         self._matrix = matrix
-        self.decisionsMade = self.matrix.getDecisionList()
-        self.attributes = self.matrix.getAttributes()
-        self.options = self.matrix.getOptions()
+        self.decisions = self._matrix.getDecisions()
+        self.decisionsMade = self._matrix.getDecisionList()
+        self.attributes = self._matrix.getAttributes()
+        self.options = self._matrix.getOptions()
+
+        self._weightedAttributes = weightedAttributes
 
         self.rankedDecisions = []
         for item in rankOrder:
@@ -34,37 +38,133 @@ class DecisionTracer:
         sum_y_sq = sum(map(lambda x: pow(x, 2), y))
         psum = sum(map(lambda x, y: x * y, x, y))
         num = psum - (sum_x * sum_y/n)
-        den = pow((sum_x_sq - pow(sum_x, 2) / n) * (sum_y_sq - pow(sum_y, 2) / n), 0.5)
+        den = pow((sum_x_sq - pow(sum_x, 2) / n) * 
+                    (sum_y_sq - pow(sum_y, 2) / n), 0.5)
         if den == 0: return 0
         return num / den
 
-    def searchIndex(self):
+    def countTransitions(self):
         numOPWISE = 0
         numATTWISE = 0
         numMIXED = 0
-
-        optionTimes = {}
 
         iterDecisionList = iter(self._decisionsMade)
         iterDecisionList.__next__()
         previousDecision = self._decisionsMade[0]
         for entry in iterDecisionList:
-            if(previousDecision["attribute"] == entry["attribute"]): #within attribute switch; option changes #intradimensional
+            #within attribute switch; option changes #intradimensional
+            if(previousDecision["attribute"] == entry["attribute"]): 
                 numATTWISE += 1
-            elif(previousDecision["option"] == entry["option"]):     #within option switch; attribute changes #interdimensional
+            #within option switch; attribute changes #interdimensional
+            elif(previousDecision["option"] == entry["option"]):     
                 numOPWISE += 1
-            else:                                                    #both the option and attribute change
+            #both the option and attribute change
+            else:                                                    
                 numMIXED += 1
+        return numOPWISE, numATTWISE, numMIXED
+
+    def calculateOptionTimes(self):
+        optionTimes = {}
+        for entry in self._decisionsMade:
             if(entry["option"] not in optionTimes): # sum the total amount of time
-                                                      # spent looking at each option
+                                                    # spent looking at each option
                 optionTimes[entry["option"]] = 0
             optionTimes[entry["option"]] += entry["timeViewed"]
+        return optionTimes
 
-            previousDecision = entry
-
-        searchIndex = (numOPWISE - numATTWISE)/(numOPWISE + numATTWISE)
+    def searchIndex(self):
+        intra, inter, mixed = countTransitions()
+        searchIndex = (inter - intra)/(inter + intra)
         debugLog(searchIndex)
         return searchIndex
+
+    def method1(self, opWise, attWise, mixed, correlation = 0.7):
+        """Capture EQW, MAU, LIM and LVA"""
+        OPATTRatio = ((len(self._attributes) - 1)*len(self._options))
+                        /(len(self._options) - 1) #ratio of options to attributes
+        if((opWise/(attWise+mixed))/OPATTRatio < correlation):
+            return "DIS|SAT"
+        else:
+            ###################################
+            # SEPARATE EQW, MAU, LIM, AND LVA #
+            ###################################
+            # EQW ranking of options is just the sum of all the option's 
+            #     utility values.
+            # MAU ranking is sum of all utility values, with weights according 
+            #     to how good each attribute is (weights must add up to 1)
+            # LIM chooses the option with the worst value of the least important
+            #     attribute
+            # LVA chooses the option with the least variance across attribute 
+            #     values
+
+            ranks = {"MAU":[],"LIM":[],"LVA":[], "EQW":[]}
+
+            lowestAttribute = min(self._weightedAttributes, 
+                                  key=self._weightedAttributes.get)
+
+            for option in self._options: #iterate through each option and grab a
+                                         #list of all the decisions connected to it
+                    #grab all the decisions that belong to that option
+                    thisOptionsDecisions = [d for d in self._decisions
+                                            if d["option"] == option] 
+
+                    utilityValues = [d["utility"] for d in thisOptionsDecisions]
+                    utilityAverage = sum(utilityValues)/len(self._options)
+
+                    #EQW ranks
+                    ranks["EQW"].append((sum(utilityValues), option))
+
+                    MAUUtility = 0
+                    variance = 0
+
+                    #flip through each decision in the ones we grabbed
+                    for thisDecision in thisOptionsDecisions: 
+                        #MAU ranks
+                        #weight that thisDecision's utility by the attribute weight
+                        MAUUtility += thisDecision["utility"] * 
+                                      self._weightedAttributes[thisDecision["attribute"]] 
+                                      #the weight of the attribute currently being looked at
+                                      #by thisDecision
+
+                        #LIM ranks
+                        if(thisDecision["attribute"] == lowestAttribute):
+                            ranks["LIM"].append((thisDecision["utility"], option))
+
+                        #LVA ranks
+                        variance += (thisDecision["utility"] - utilityAverage) ** 2
+
+                    variance = variance / (len(options) - 1)
+                    ranks["LVA"].append((variance, option))
+
+                    ranks["MAU"].append((MAUUtility, option))
+
+            ranks["EQW"].sort(reverse=True)
+            ranks["MAU"].sort(reverse=True)
+            ranks["LIM"].sort()
+            ranks["LVA"].sort()
+
+            bestMatchName = ""
+            bestMatchScore = 1000
+
+            for style, currentList in ranks.items():            
+                deviation = 0
+
+                print(style, currentList)
+                currentUtilities, currentOptions = zip(*currentList)
+
+                for predictedItemRank, predictedItem in enumerate(currentOptions):
+                    #grab the rank of that option in the user-inputed rank list
+                    empiricalRank = rankedDecisions.index(predictedItem) 
+                    deviation = (predictedItemRank - empiricalRank) ** 2    
+
+                if(deviation < bestMatchScore):
+                    bestMatchScore = deviation
+                    bestMatchName = style
+
+            return bestMatchName
+
+
+
 
 #list-of-dict, list-of-str, list-of-str --> str
 def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPercentage=0.7, timeTolerance=0.8):
