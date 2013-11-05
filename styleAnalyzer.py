@@ -1,36 +1,81 @@
 #!/usr/bin/python3
 from decisionMatrix import *
 
-_DEBUG = True
-def debugLog(msg):
-    if(_DEBUG):
-        print(msg)
+class DecisionTracer:
+    _attributes = []
+    _options = []
 
-def pearsonr(x, y):
-    # Assume len(x) == len(y)
-    n = len(x)
-    sum_x = float(sum(x))
-    sum_y = float(sum(y))
-    sum_x_sq = sum(map(lambda x: pow(x, 2), x))
-    sum_y_sq = sum(map(lambda x: pow(x, 2), y))
-    psum = sum(map(lambda x, y: x * y, x, y))
-    num = psum - (sum_x * sum_y/n)
-    den = pow((sum_x_sq - pow(sum_x, 2) / n) * (sum_y_sq - pow(sum_y, 2) / n), 0.5)
-    if den == 0: return 0
-    return num / den
+    _decisionsMade = []
+    _rankedDecisions = []
+    _weightedAttributes = {}
+
+    def __init__(self, matrix, rankedDecisions, weightedAttributes):
+        self._matrix = matrix
+        self.decisionsMade = self.matrix.getDecisionList()
+        self.attributes = self.matrix.getAttributes()
+        self.options = self.matrix.getOptions()
+
+        self.rankedDecisions = []
+        for item in rankOrder:
+            decisionEntry = self.matrix.findDecision(item)
+            self.rankedDecisions.append(decisionEntry["option"])
+
+    _DEBUG = True
+    def debugLog(*msg):
+        if(self._DEBUG):
+            print(msg)
+
+    def pearsonr(x, y):
+        # Assume len(x) == len(y)
+        n = len(x)
+        sum_x = float(sum(x))
+        sum_y = float(sum(y))
+        sum_x_sq = sum(map(lambda x: pow(x, 2), x))
+        sum_y_sq = sum(map(lambda x: pow(x, 2), y))
+        psum = sum(map(lambda x, y: x * y, x, y))
+        num = psum - (sum_x * sum_y/n)
+        den = pow((sum_x_sq - pow(sum_x, 2) / n) * (sum_y_sq - pow(sum_y, 2) / n), 0.5)
+        if den == 0: return 0
+        return num / den
+
+    def searchIndex(self):
+        numOPWISE = 0
+        numATTWISE = 0
+        numMIXED = 0
+
+        optionTimes = {}
+
+        iterDecisionList = iter(self._decisionsMade)
+        iterDecisionList.__next__()
+        previousDecision = self._decisionsMade[0]
+        for entry in iterDecisionList:
+            if(previousDecision["attribute"] == entry["attribute"]): #within attribute switch; option changes #intradimensional
+                numATTWISE += 1
+            elif(previousDecision["option"] == entry["option"]):     #within option switch; attribute changes #interdimensional
+                numOPWISE += 1
+            else:                                                    #both the option and attribute change
+                numMIXED += 1
+            if(entry["option"] not in optionTimes): # sum the total amount of time
+                                                      # spent looking at each option
+                optionTimes[entry["option"]] = 0
+            optionTimes[entry["option"]] += entry["timeViewed"]
+
+            previousDecision = entry
+
+        searchIndex = (numOPWISE - numATTWISE)/(numOPWISE + numATTWISE)
+        debugLog(searchIndex)
+        return searchIndex
 
 #list-of-dict, list-of-str, list-of-str --> str
 def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPercentage=0.7, timeTolerance=0.8):
-    decisionList = matrix.getDecisionList()
-    if(len(decisionList) <= 1):
-        return "ERR: Not enough decisions made."
+    decisionsMade = matrix.getDecisionList()
     attributes = matrix.getAttributes()
     options = matrix.getOptions()
-    decisionRankList = []
 
+    rankedDecisions = []
     for item in rankOrder:
         decisionEntry = matrix.findDecision(item)
-        decisionRankList.append(decisionEntry["option"])
+        rankedDecisions.append(decisionEntry["option"])
 
     optionTimes = {}
 
@@ -39,9 +84,9 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
     numMIXED = 0
 
     # Figure out what the ratio of option-wise, attribute-wise, and mixed transitions there are
-    iterDecisionList = iter(decisionList)
+    iterDecisionList = iter(decisionsMade)
     iterDecisionList.__next__()
-    previousDecision = decisionList[0]
+    previousDecision = decisionsMade[0]
     for entry in iterDecisionList:
         if(previousDecision["attribute"] == entry["attribute"]): #within attribute switch; option changes #intradimensional
             numATTWISE += 1
@@ -78,7 +123,7 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
 
             # TODO(alilja@iastate.edu) for some reason EQW/LIM and MAU/LVA are getting called at the same time. It's probably because of the matrix settings.
 
-            ranks = {"EQW":[],"MAU":[],"LIM":[],"LVA":[]}
+            ranks = {"MAU":[],"LIM":[],"LVA":[], "EQW":[]}
 
             lowestAttribute = min(weightedAttributes, key=weightedAttributes.get)
 
@@ -126,7 +171,7 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
 
                 for predictedItemRank, predictedItem in enumerate(currentOptions):
                     #grab the rank of that option in the user-inputed rank list
-                    empiricalRank = decisionRankList.index(predictedItem) 
+                    empiricalRank = rankedDecisions.index(predictedItem) 
                     deviation = (predictedItemRank - empiricalRank) ** 2    
 
                 if(deviation < bestMatchScore):
@@ -144,7 +189,7 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         #####################################################
 
         #grab the attributes for every decision the user made
-        attributesViewedOrdered = [x["attribute"] for x in decisionList]
+        attributesViewedOrdered = [x["attribute"] for x in decisionsMade]
 
         #create an empty list of lists as long as there are attributes 
         attributeRanks = [[] for i in range(0, len(attributes))] 
@@ -174,8 +219,9 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         if(correlation < 0):
             return("EBA|LEX|REC")
         else:
-            minTime = min(optionTimes.itervalues())
-            maxTime = max(optionTimes.itervalues())
+            minTime = min(optionTimes.values())
+            maxTime = max(optionTimes.values())
+            debugLog(minTime, maxTime)
             if(minTime/maxTime >= 0.8):
                 return("DOM|MAJ")
             return("ADD|MCD")
@@ -186,14 +232,14 @@ decisions = DecisionMatrix()
 data = ""
 rankedDecisions = []
 
-preBuiltDecisions = [1,2,3,
-                     4,5,6,
-                     7,8,9]
+preBuiltDecisions = [1,2,3,4,5,6,7,8,9] #[1,4,7,2,5,8,3,6,9]
 
-selectedOptions = [9, 5, 1]
+
+selectedOptions = [7, 4, 1]
 
 for viewed in preBuiltDecisions:
     decisions.view("d0"+str(viewed))
+    decisions.viewedDecisions[-1]["timeViewed"] = 1
 
 for selected in selectedOptions:
     rankedDecisions.append("d0"+str(selected))

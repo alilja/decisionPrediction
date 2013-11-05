@@ -21,6 +21,17 @@ class TextFormatting:
             output.append(self.centerText(item, standardWidth))
         return output
 
+class Decision:
+    def __init__(self, name, attribute, option, info, utility, timeOpened=0, timeViewed=0):
+        self.name = name
+        self.attribute = attribute
+        self.option = option
+        self.attribute = attribute
+        self.info = info
+        self.utility = utility
+        self.timeOpened = timeOpened
+        self.timeViewed = timeViewed
+    
 class DecisionMatrix:
     options = []
     attributes = []
