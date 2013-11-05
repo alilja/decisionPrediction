@@ -32,7 +32,7 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         decisionEntry = matrix.findDecision(item)
         decisionRankList.append(decisionEntry["option"])
 
-    decisionTimes = {}
+    optionTimes = {}
 
     numOPWISE = 0
     numATTWISE = 0
@@ -49,10 +49,11 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
             numOPWISE += 1
         else:                                                    #both the option and attribute change
             numMIXED += 1
-        if(entry["name"] not in decisionTimes):
-            decisionTimes[entry["name"]] = 0
-        decisionTimes[entry["name"]] += entry["timeViewed"]
-        
+        if(entry["option"] not in optionTimes): # sum the total amount of time
+                                                  # spent looking at each option
+            optionTimes[entry["option"]] = 0
+        optionTimes[entry["option"]] += entry["timeViewed"]
+
         previousDecision = entry
 
     searchIndex = (numOPWISE - numATTWISE)/(numOPWISE + numATTWISE)
@@ -173,7 +174,13 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         if(correlation < 0):
             return("EBA|LEX|REC")
         else:
-            return("DOM|MAJ|ADD|MCD")
+            avgTime = sum(optionTimes.itervalues())/len(optionTimes)
+            for opt, time in optionTimes:
+                if((time - avgTime)/avgTime < 0.8):
+                    break
+            else:
+                return("DOM|MAJ")
+            return("ADD|MCD")
     else:
         return "ERR: Search index = 0.0"
 
