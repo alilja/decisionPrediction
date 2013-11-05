@@ -9,61 +9,61 @@ attributes:
   id: 03
  
 options:
-- name: yellow
-- name: green
-- name: blue
+- name: a
+- name: b
+- name: c
  
 decisions:
 - name: d01
   attribute: big
-  option: yellow
+  option: a
   info: banana
-  utility: 1
+  utility: 2
 
 - name: d02
   attribute: bigger
-  option: yellow
+  option: a
   info: big bird
   utility: 3
 
 - name: d03
   attribute: biggest
-  option: yellow
+  option: a
   info: school bus
   utility: 5
 
 - name: d04
   attribute: big
-  option: green
+  option: b
   info: sour apple
   utility: 2
 
 - name: d05
   attribute: bigger
-  option: green
+  option: b
   info: tree
   utility: 5
 
 - name: d06
   attribute: biggest
-  option: green
+  option: b
   info: nebula
   utility: 1
 
 - name: d07
   attribute: big
-  option: blue
+  option: c
   info: blueberry
   utility: 4
 
 - name: d08
   attribute: bigger
-  option: blue
+  option: c
   info: ocean
   utility: 2
 
 - name: d09
   attribute: biggest
-  option: blue
+  option: c
   info: sky
-  utility: 3
+  utility: 4
