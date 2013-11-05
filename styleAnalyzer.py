@@ -175,7 +175,7 @@ class DecisionTracer:
                     #LVA ranks
                     variance += (thisDecision["utility"] - utilityAverage) ** 2
 
-                variance = variance / (len(options) - 1)
+                variance = variance / (len(self._options) - 1)
                 ranks["LVA"].append((variance, option))
 
                 ranks["MAU"].append((MAUUtility, option))
@@ -191,12 +191,11 @@ class DecisionTracer:
         for style, currentList in ranks.items():            
             deviation = 0
 
-            print(style, currentList)
             currentUtilities, currentOptions = zip(*currentList)
 
             for predictedItemRank, predictedItem in enumerate(currentOptions):
                 #grab the rank of that option in the user-inputed rank list
-                empiricalRank = rankedDecisions.index(predictedItem) 
+                empiricalRank = self._rankedDecisions.index(predictedItem) 
                 deviation = (predictedItemRank - empiricalRank) ** 2    
 
             if(deviation < bestMatchScore):
@@ -227,7 +226,7 @@ rankedDecisions = []
 preBuiltDecisions = [1,2,3,4,5,6,7,8,9] #[1,4,7,2,5,8,3,6,9]
 
 
-selectedOptions = [7, 4, 1]
+selectedOptions = [1, 4, 7]
 
 for viewed in preBuiltDecisions:
     decisions.view("d0"+str(viewed))
@@ -254,4 +253,4 @@ decisionTracer = DecisionTracer(matrix=decisions, rankedDecisions=rankedDecision
 op, att, mix = decisionTracer.countTransitions()
 print(op, att, mix)
 print(decisionTracer.calculateSearchIndex(op, att, mix))
-#print(decisionTracer.DecisionTracer())
+print(decisionTracer.DecisionTracer())
