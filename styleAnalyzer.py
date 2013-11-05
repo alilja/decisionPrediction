@@ -174,11 +174,9 @@ def analyzeDecisionStyle(matrix, rankOrder, weightedAttributes, minCorrelationPe
         if(correlation < 0):
             return("EBA|LEX|REC")
         else:
-            avgTime = sum(optionTimes.itervalues())/len(optionTimes)
-            for opt, time in optionTimes:
-                if((time - avgTime)/avgTime < 0.8):
-                    break
-            else:
+            minTime = min(optionTimes.itervalues())
+            maxTime = max(optionTimes.itervalues())
+            if(minTime/maxTime >= 0.8):
                 return("DOM|MAJ")
             return("ADD|MCD")
     else:
