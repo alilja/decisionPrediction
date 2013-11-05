@@ -44,6 +44,15 @@ class DecisionTracer:
         if den == 0: return 0
         return num / den
 
+    def fuzzyEquality(self, iterator):
+    # TODO(alilja@iastate.edu) actually make this fuzzy
+        try:
+            iterator = iter(iterator)
+            first = next(iterator)
+            return all(first == rest for rest in iterator)
+        except StopIteration:
+            return True
+
     def countTransitions(self):
         numOPWISE = 0
         numATTWISE = 0
