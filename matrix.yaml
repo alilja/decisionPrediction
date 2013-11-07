@@ -54,7 +54,7 @@ decisions:
   attribute: big
   option: c
   info: blueberry
-  utility: 4
+  utility: 3
 
 - name: d08
   attribute: bigger

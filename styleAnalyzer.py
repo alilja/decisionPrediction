@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-#v0.1.0
+#v0.1.1
+# method4 works
 from decisionMatrix import *
 
 class DecisionTracer:
@@ -72,7 +73,6 @@ class DecisionTracer:
             #both the option and attribute change
             else:                                                    
                 numMIXED += 1
-            print(entry)
             previousDecision = entry
         return numOPWISE, numATTWISE, numMIXED
 
@@ -208,16 +208,23 @@ class DecisionTracer:
         for style, currentList in ranks.items():            
             deviation = 0
 
+            self.debugLog(style, currentList)
             currentUtilities, currentOptions = zip(*currentList)
 
             for predictedItemRank, predictedItem in enumerate(currentOptions):
                 #grab the rank of that option in the user-inputed rank list
                 empiricalRank = self._rankedDecisions.index(predictedItem) 
-                deviation = (predictedItemRank - empiricalRank) ** 2    
+                self.debugLog(empiricalRank, self._rankedDecisions[empiricalRank], predictedItem)
+                deviation += (predictedItemRank - empiricalRank) ** 2    
 
             if(deviation < bestMatchScore):
                 bestMatchScore = deviation
                 bestMatchName = style
+            elif(deviation == bestMatchScore):
+                if(bestMatchName):
+                    bestMatchName += "|%s" % style
+                else:
+                    bestMatchName = style
 
         return bestMatchName
 
@@ -244,7 +251,7 @@ rankedDecisions = []
 preBuiltDecisions = [1,2,3,4,5,6,7,8,9] #[1,4,7,2,5,8,3,6,9]
 
 
-selectedOptions = [1, 4, 7]
+selectedOptions = [4, 7, 1]
 
 for viewed in preBuiltDecisions:
     decisions.view("d0"+str(viewed))
