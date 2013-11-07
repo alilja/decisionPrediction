@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+#v0.1.0
 from decisionMatrix import *
 
 class DecisionTracer:
@@ -87,6 +88,13 @@ class DecisionTracer:
     def calculateSearchIndex(self, op, att, mixed):
         searchIndex = (op - att)/(op + att)
         return searchIndex
+
+    def calculateSearchMeasure(self, op, att, mixed):
+        total = op + att + mixed
+        A = len(self._options)
+        D = len(self._attributes)
+        return ((((total) ** 0.5) * ((A * D / total) * (op - att) - (D - A)))/
+                ((A ** 2) * (D - 1) + (D ** 2) * (A - 1))** 0.5)
 
     def method1(self, opWise, attWise, mixed):
         """Capture EQW, MAU, LIM and LVA"""
@@ -216,8 +224,9 @@ class DecisionTracer:
     def DecisionTracer(self, correlation = 0.7):
         op, att, mix = self.countTransitions()
         searchIndex = self.calculateSearchIndex(op, att, mix)
+        if(searchIndex == 0):
+            searchIndex = self.calculateSearchMeasure(op, att, mix)
         if(searchIndex > 0):
-            
             if(self.method1(op, att, mix) >= correlation):
                 return self.method4()
             else:
@@ -259,7 +268,9 @@ for selected in selectedOptions:
 
 decisionTracer = DecisionTracer(matrix=decisions, rankedDecisions=rankedDecisions, 
                         weightedAttributes={"big":0.5,"bigger":0.3,"biggest":0.2})
+
 op, att, mix = decisionTracer.countTransitions()
 print(op, att, mix)
+print(decisionTracer.calculateSearchMeasure(op, att, mix))
 print(decisionTracer.calculateSearchIndex(op, att, mix))
 print(decisionTracer.DecisionTracer())
