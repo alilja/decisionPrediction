@@ -46,14 +46,20 @@ class DecisionTracer:
         if den == 0: return 0
         return num / den
 
-    def fuzzyEquality(self, iterator):
-    # TODO(alilja@iastate.edu) actually make this fuzzy
-        try:
-            iterator = iter(iterator)
-            first = next(iterator)
-            return all(first == rest for rest in iterator)
-        except StopIteration:
-            return True
+    def fuzzyEquality(self, input_list):
+        results = {input_list[0]: [input_list[0]]}    # Start with first value
+        for value in input_list[1:]:         # loop through our entire list after first value
+            hi = value * 1.2
+            low = value * 0.8
+            self.debugLog()("Value: {0}\tHi: {1}\tLow:{2}".format(value, hi, low))
+            for existing in results:     # search through our result set
+                found_similar = False
+                if low < existing < hi:  # if we find a match
+                    results[existing].append(value)    # we add our value to the list for that set
+                    found_similar = True
+                    break
+            if not found_similar:        # if we looped through our entire results without a match
+                results[value] = [value] # Create a new entry in our results dictionary
 
     def countTransitions(self):
         numOPWISE = 0
@@ -248,10 +254,10 @@ decisions = DecisionMatrix()
 data = ""
 rankedDecisions = []
 
-preBuiltDecisions = [1,2,3,4,5,6,7,8,9] #[1,4,7,2,5,8,3,6,9]
+preBuiltDecisions = [1,4,7,2,5,8,3,6,9] #[1,2,3,4,5,6,7,8,9]
 
 
-selectedOptions = [4, 7, 1]
+selectedOptions = [4]
 
 for viewed in preBuiltDecisions:
     decisions.view("d0"+str(viewed))
