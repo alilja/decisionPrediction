@@ -1,6 +1,18 @@
 #!/usr/bin/python3
-#v0.1.1
-# method4 works
+#v0.1.2
+# Decision stlyes:
+#   Tested, Working:
+#       EQW
+#       LIM
+#       MAU
+#       LVA
+#       ADD
+#       MCD
+#       DOM
+#       MAJ
+#   Tested, Not working:
+#
+
 from decisionMatrix import *
 
 class DecisionTracer:
@@ -46,20 +58,15 @@ class DecisionTracer:
         if den == 0: return 0
         return num / den
 
-    def fuzzyEquality(self, input_list):
-        results = {input_list[0]: [input_list[0]]}    # Start with first value
-        for value in input_list[1:]:         # loop through our entire list after first value
-            hi = value * 1.2
-            low = value * 0.8
-            self.debugLog()("Value: {0}\tHi: {1}\tLow:{2}".format(value, hi, low))
-            for existing in results:     # search through our result set
-                found_similar = False
-                if low < existing < hi:  # if we find a match
-                    results[existing].append(value)    # we add our value to the list for that set
-                    found_similar = True
-                    break
-            if not found_similar:        # if we looped through our entire results without a match
-                results[value] = [value] # Create a new entry in our results dictionary
+    def fuzzyEquality(self, iterator):
+        try:
+            iterator = iter(iterator)
+            first = next(iterator)
+            hi = first * 1.2
+            lo = first * 0.8
+            return all(lo <= rest <= hi for rest in iterator)
+        except StopIteration:
+            return True
 
     def countTransitions(self):
         numOPWISE = 0
@@ -96,6 +103,7 @@ class DecisionTracer:
         return searchIndex
 
     def calculateSearchMeasure(self, op, att, mixed):
+        # see Böckenholt & Hynan (1994) Caveats on a process-tracing measure and a remedy, pg. 107
         total = op + att + mixed
         A = len(self._options)
         D = len(self._attributes)
@@ -109,11 +117,9 @@ class DecisionTracer:
         return (opWise/(attWise+mixed))/OPATTRatio        
 
     def method2(self):
-        optionTimes = self.calculateOptionTimes()
-        minTime = min(optionTimes.values())
-        maxTime = max(optionTimes.values())
-        self.debugLog(minTime, maxTime)
-        if(minTime/maxTime >= 0.8):
+        options, optionTimes = zip(*self.calculateOptionTimes().items())
+        print(self.fuzzyEquality(optionTimes))
+        if(self.fuzzyEquality(optionTimes)):
             return("DOM|MAJ")
         return("ADD|MCD")
 
@@ -259,9 +265,9 @@ preBuiltDecisions = [1,4,7,2,5,8,3,6,9] #[1,2,3,4,5,6,7,8,9]
 
 selectedOptions = [4]
 
-for viewed in preBuiltDecisions:
+for i, viewed in enumerate(preBuiltDecisions):
     decisions.view("d0"+str(viewed))
-    decisions.viewedDecisions[-1]["timeViewed"] = 1
+    decisions.viewedDecisions[-1]["timeViewed"] = 3*i
 
 for selected in selectedOptions:
     rankedDecisions.append("d0"+str(selected))
