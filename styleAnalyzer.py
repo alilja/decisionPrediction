@@ -1,17 +1,5 @@
 #!/usr/bin/python3
-#v0.1.2
-# Decision stlyes:
-#   Tested, Working:
-#       EQW
-#       LIM
-#       MAU
-#       LVA
-#       ADD
-#       MCD
-#       DOM
-#       MAJ
-#   Tested, Not working:
-#
+#v0.1.3
 
 from decisionMatrix import *
 
@@ -118,7 +106,6 @@ class DecisionTracer:
 
     def method2(self):
         options, optionTimes = zip(*self.calculateOptionTimes().items())
-        print(self.fuzzyEquality(optionTimes))
         if(self.fuzzyEquality(optionTimes)):
             return("DOM|MAJ")
         return("ADD|MCD")
@@ -130,6 +117,7 @@ class DecisionTracer:
 
         #grab the attributes for every decision the user made
         attributesViewedOrdered = [x["attribute"] for x in self._decisionsMade]
+        print(attributesViewedOrdered)
 
         #create an empty list of lists as long as there are attributes 
         attributeRanks = [[] for i in range(0, len(self._attributes))] 
@@ -142,13 +130,16 @@ class DecisionTracer:
             attributeIndex = self._attributes.index(attributeViewed) 
             attributeRanks[attributeIndex].append(rank) 
 
+        self.debugLog(attributeRanks)
         ARList = []
         NBoxList = []
 
         for attributeRankList in attributeRanks:
             nbox = len(attributeRankList)
             gross = sum(attributeRankList)
-            avg = gross/nbox
+            avg = 0
+            if(nbox > 0):
+                avg = gross/nbox
 
             ARList.append(avg)
             NBoxList.append(nbox)
@@ -240,18 +231,25 @@ class DecisionTracer:
 
         return bestMatchName
 
-    def DecisionTracer(self, correlation = 0.7):
+    def DecisionTracer(self, correlation = 1):
         op, att, mix = self.countTransitions()
         searchIndex = self.calculateSearchIndex(op, att, mix)
         if(searchIndex == 0):
             searchIndex = self.calculateSearchMeasure(op, att, mix)
+        self.debugLog("SI:",searchIndex)
         if(searchIndex > 0):
-            if(self.method1(op, att, mix) >= correlation):
+            self.debugLog("method 1/4")
+            p = self.method1(op, att, mix)
+            self.debugLog("method1:",p,"correlation",correlation)
+            if(p >= correlation):
                 return self.method4()
             else:
                 return "DIS|SAT"
         else:
-            if(self.method3() < 0):
+            self.debugLog("method 3/2")
+            r = self.method3()
+            self.debugLog("r",r)
+            if(r < 0):
                 return("EBA|LEX|REC")
             else:
                 return self.method2()
@@ -260,7 +258,7 @@ decisions = DecisionMatrix()
 data = ""
 rankedDecisions = []
 
-preBuiltDecisions = [1,4,7,2,5,8,3,6,9] #[1,2,3,4,5,6,7,8,9]
+preBuiltDecisions = [1,7,4,3,9,5] #[1,4,7,2,5,8,3,6,9] #[1,2,3,4,5,6,7,8,9] #
 
 
 selectedOptions = [4]
@@ -292,4 +290,5 @@ op, att, mix = decisionTracer.countTransitions()
 print(op, att, mix)
 print(decisionTracer.calculateSearchMeasure(op, att, mix))
 print(decisionTracer.calculateSearchIndex(op, att, mix))
+print(decisionTracer.pearsonr([4.5, 10.5, 13.5],[8,4,2]))
 print(decisionTracer.DecisionTracer())
