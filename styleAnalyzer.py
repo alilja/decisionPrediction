@@ -4,14 +4,6 @@
 from decisionMatrix import *
 
 class DecisionTracer:
-    _attributes = []
-    _options = []
-    _decisions = []
-
-    _decisionsMade = []
-    _rankedDecisions = []
-    _weightedAttributes = {}
-
     def __init__(self, matrix, rankedDecisions, weightedAttributes):
         self._matrix = matrix
         self._decisions = self._matrix.getDecisions()
@@ -26,7 +18,7 @@ class DecisionTracer:
             decisionEntry = self._matrix.findDecision(item)
             self._rankedDecisions.append(decisionEntry["option"])
 
-        self._DEBUG = True
+        self._DEBUG = False
 
     def debugLog(self, *msg):
         if(self._DEBUG):
@@ -117,7 +109,6 @@ class DecisionTracer:
 
         #grab the attributes for every decision the user made
         attributesViewedOrdered = [x["attribute"] for x in self._decisionsMade]
-        print(attributesViewedOrdered)
 
         #create an empty list of lists as long as there are attributes 
         attributeRanks = [[] for i in range(0, len(self._attributes))] 

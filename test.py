@@ -1,4 +1,4 @@
-from styleAnalyzer import DecisionMatrix
+from styleAnalyzer import *
 
 decisions = DecisionMatrix()
 data = ""
@@ -33,8 +33,5 @@ decisionTracer = DecisionTracer(matrix=decisions, rankedDecisions=rankedDecision
                         weightedAttributes={"big":0.5,"bigger":0.3,"biggest":0.2})
 
 op, att, mix = decisionTracer.countTransitions()
-print(op, att, mix)
-print(decisionTracer.calculateSearchMeasure(op, att, mix))
-print(decisionTracer.calculateSearchIndex(op, att, mix))
-print(decisionTracer.pearsonr([4.5, 10.5, 13.5],[8,4,2]))
+decisionTracer._DEBUG = True
 print(decisionTracer.DecisionTracer())

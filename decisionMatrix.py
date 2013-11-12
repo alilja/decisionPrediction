@@ -129,7 +129,4 @@ class DecisionMatrix:
     def getDecisionOption(self, decisionName):
         return self.findDecision(decisionName)["option"]
 
-test = DecisionMatrix("matrix.yaml")
-print(test.findDecision("d01"))
-
     
