@@ -222,7 +222,7 @@ class DecisionTracer:
 
         return bestMatchName
 
-    def DecisionTracer(self, correlation = 1):
+    def DecisionTracer(self, correlation = 0.8):
         op, att, mix = self.countTransitions()
         searchIndex = self.calculateSearchIndex(op, att, mix)
         if(searchIndex == 0):
