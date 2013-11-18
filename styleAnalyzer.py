@@ -157,39 +157,39 @@ class DecisionTracer:
 
         for option in self._options: #iterate through each option and grab a
                                      #list of all the decisions connected to it
-                #grab all the decisions that belong to that option
-                thisOptionsDecisions = [d for d in self._decisions
-                                        if d["option"] == option] 
+            #grab all the decisions that belong to that option
+            thisOptionsDecisions = [d for d in self._decisions
+                                    if d["option"] == option] 
 
-                utilityValues = [d["utility"] for d in thisOptionsDecisions]
-                utilityAverage = sum(utilityValues)/len(self._options)
+            utilityValues = [d["utility"] for d in thisOptionsDecisions]
+            utilityAverage = sum(utilityValues)/len(self._options)
 
-                #EQW ranks
-                ranks["EQW"].append((sum(utilityValues), option))
+            #EQW ranks
+            ranks["EQW"].append((sum(utilityValues), option))
 
-                MAUUtility = 0
-                variance = 0
+            MAUUtility = 0
+            variance = 0
 
-                #flip through each decision in the ones we grabbed
-                for thisDecision in thisOptionsDecisions: 
-                    #MAU ranks
-                    #weight that thisDecision's utility by the attribute weight
-                    MAUUtility += (thisDecision["utility"]* 
-                                  self._weightedAttributes[thisDecision["attribute"]]) 
-                                  #the weight of the attribute currently being looked at
-                                  #by thisDecision
+            #flip through each decision in the ones we grabbed
+            for thisDecision in thisOptionsDecisions: 
+                #MAU ranks
+                #weight that thisDecision's utility by the attribute weight
+                MAUUtility += (thisDecision["utility"]* 
+                              self._weightedAttributes[thisDecision["attribute"]]) 
+                              #the weight of the attribute currently being looked at
+                              #by thisDecision
 
-                    #LIM ranks
-                    if(thisDecision["attribute"] == lowestAttribute):
-                        ranks["LIM"].append((thisDecision["utility"], option))
+                #LIM ranks
+                if(thisDecision["attribute"] == lowestAttribute):
+                    ranks["LIM"].append((thisDecision["utility"], option))
 
-                    #LVA ranks
-                    variance += (thisDecision["utility"] - utilityAverage) ** 2
+                #LVA ranks
+                variance += (thisDecision["utility"] - utilityAverage) ** 2
 
-                variance = variance / (len(self._options) - 1)
-                ranks["LVA"].append((variance, option))
+            variance = variance / (len(self._options) - 1)
+            ranks["LVA"].append((variance, option))
 
-                ranks["MAU"].append((MAUUtility, option))
+            ranks["MAU"].append((MAUUtility, option))
 
         ranks["EQW"].sort(reverse=True)
         ranks["MAU"].sort(reverse=True)

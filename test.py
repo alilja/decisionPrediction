@@ -4,8 +4,8 @@ decisions = DecisionMatrix()
 data = ""
 rankedDecisions = []
 
-preBuiltDecisions = [1,4,7,2,5,8,3,6,9] #[1,7,4,3,9,5] #[1,4,7,2,5,8,3,6,9] #[1,2,3,4,5,6,7,8,9]
-selectedOptions = [9,1,4]
+preBuiltDecisions = [1,2,3,4,5,6,7,8,9] #[1,7,4,3,9,5] #[1,4,7,2,5,8,3,6,9] #[1,2,3,4,5,6,7,8,9]
+selectedOptions = [4,7,1]
 
 # [1,2,3,4,5,6,7,8,9]
 #   [1,7,4] EQW
